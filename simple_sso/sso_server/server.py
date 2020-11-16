@@ -140,7 +140,7 @@ class Server:
         def __init__(self, **kwargs):
             for key, value in kwargs.items():
                 setattr(self, key, value)
-            self.register_admin()
+            # self.register_admin()
 
         def register_admin(self):
             admin.site.register(Consumer, self.client_admin)
