@@ -66,7 +66,7 @@ class CustomConsumer(SyncConsumer):
     def send_request(self, url, data, headers):
         if self.extra_headers:
             headers.update(self.extra_headers)
-        return super(CustomConsumer, self).send_request(self, url, data, headers)
+        return super(CustomConsumer, self).send_request(url, data, headers)
 
 
 class Client:
