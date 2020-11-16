@@ -74,12 +74,12 @@ class Client:
         self.server_url = server_url
         self.public_key = public_key
         self.private_key = private_key
-        client = self.create_session(http_auth, http_verify)
+        client = self.create_session(http_verify, http_auth)
         self.consumer = CustomConsumer(self.server_url, self.public_key, self.private_key, client)
         if user_extra_data:
             self.user_extra_data = user_extra_data
 
-    def create_session(http_verify=True, http_auth=None, proxies=None):
+    def create_session(self, http_verify=True, http_auth=None, proxies=None):
         session = requests.Session()
         session.verify = http_verify
         session.auth = http_auth
