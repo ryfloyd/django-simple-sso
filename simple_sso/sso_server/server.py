@@ -58,7 +58,7 @@ class AuthorizeView(View):
         if not self.check_token_timeout():
             return self.token_timeout()
         self.token.refresh()
-        if request.user.is_authenticated:
+        if hasattr(request, 'user') and request.user.is_authenticated:
             return self.handle_authenticated_user()
         else:
             return self.handle_unauthenticated_user()
