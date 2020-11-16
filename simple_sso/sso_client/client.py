@@ -1,3 +1,4 @@
+import requests
 from urllib.parse import urlparse, urlunparse, urljoin, urlencode
 
 from django.urls import re_path
@@ -56,6 +57,12 @@ class AuthenticateView(LoginView):
         return HttpResponseRedirect(next)
 
 
+class CustomConsumer(SyncConsumer):
+    def __init__(self, base_url, public_key, private_key, client):
+        super(CustomConsumer, self).__init__(base_url, public_key, private_key)
+        self.session = client
+
+
 class Client:
     login_view = LoginView
     authenticate_view = AuthenticateView
@@ -63,13 +70,22 @@ class Client:
     user_extra_data = None
 
     def __init__(self, server_url, public_key, private_key,
-                 user_extra_data=None):
+                 user_extra_data=None, http_auth=True, http_verify=True):
         self.server_url = server_url
         self.public_key = public_key
         self.private_key = private_key
-        self.consumer = SyncConsumer(self.server_url, self.public_key, self.private_key)
+        client = self.create_session(http_auth, http_verify)
+        self.consumer = CustomConsumer(self.server_url, self.public_key, self.private_key, client)
         if user_extra_data:
             self.user_extra_data = user_extra_data
+
+    def create_session(http_verify=True, http_auth=None, proxies=None):
+        session = requests.Session()
+        session.verify = http_verify
+        session.auth = http_auth
+        if proxies:
+            session.proxies.update(proxies)
+        return session
 
     @classmethod
     def from_dsn(cls, dsn):
