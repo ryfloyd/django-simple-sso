@@ -58,9 +58,15 @@ class AuthenticateView(LoginView):
 
 
 class CustomConsumer(SyncConsumer):
-    def __init__(self, base_url, public_key, private_key, client):
+    def __init__(self, base_url, public_key, private_key, client, extra_headers):
         super(CustomConsumer, self).__init__(base_url, public_key, private_key)
         self.session = client
+        self.extra_headers = extra_headers
+
+    def send_request(self, url, data, headers):
+        if self.extra_headers:
+            headers.update(self.extra_headers)
+        return super(CustomConsumer, self).send_request(self, url, data, headers)
 
 
 class Client:
@@ -70,12 +76,13 @@ class Client:
     user_extra_data = None
 
     def __init__(self, server_url, public_key, private_key,
-                 user_extra_data=None, http_auth=True, http_verify=True):
+                 user_extra_data=None, http_auth=True, http_verify=True, extra_headers=None):
         self.server_url = server_url
         self.public_key = public_key
         self.private_key = private_key
+        self.extra_headers = extra_headers
         client = self.create_session(http_verify, http_auth)
-        self.consumer = CustomConsumer(self.server_url, self.public_key, self.private_key, client)
+        self.consumer = CustomConsumer(self.server_url, self.public_key, self.private_key, client, extra_headers)
         if user_extra_data:
             self.user_extra_data = user_extra_data
 
