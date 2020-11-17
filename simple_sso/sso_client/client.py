@@ -123,7 +123,7 @@ class Client:
             url = reverse('simple-sso-verify')
         except NoReverseMatch:
             # thisisfine
-            url = '/verify/'
+            url = '/sso/verify/'
         user_data = self.consumer.consume(url, data)
         user = self.build_user(user_data)
         return user
